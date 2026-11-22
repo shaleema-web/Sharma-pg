@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1565C0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sharma PG">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Sharma PG</title>
+<style>
+  :root {
+    --blue: #1565C0;
+    --blue-dark: #0D47A1;
+    --blue-soft: #E3EEFB;
+    --black: #111418;
+    --grey: #5F6B7A;
+    --line: #DCE3EC;
+    --white: #FFFFFF;
+    --bg: #F4F7FB;
+    --green: #1B8A4B;
+    --green-soft: #E6F6EC;
+    --red: #C62828;
+    --red-soft: #FDECEC;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--black);
+    font-size: 17px;
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+  header {
+    background: var(--blue);
+    color: var(--white);
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 18px;
+    position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,.15);
+  }
+  header h1 { font-size: 24px; font-weight: 800; letter-spacing: .3px; }
+  header p { font-size: 15px; opacity: .9; margin-top: 2px; }
+
+  main { padding: 16px; max-width: 720px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; }
+  h2 { font-size: 21px; margin: 4px 0 12px; }
+  h3 { font-size: 18px; margin-bottom: 6px; }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(21,101,192,.08);
+    border: 1px solid var(--line);
+  }
+  .muted { color: var(--grey); font-size: 15px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .stack > * + * { margin-top: 10px; }
+  .amount { font-weight: 800; font-size: 20px; color: var(--blue-dark); }
+
+  .badge {
+    display: inline-block; padding: 5px 12px; border-radius: 999px;
+    font-size: 14px; font-weight: 700;
+  }
+  .badge.paid { background: var(--green-soft); color: var(--green); }
+  .badge.unpaid { background: var(--red-soft); color: var(--red); }
+
+  .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .summary .card { margin: 0; text-align: center; }
+  .summary .big { font-size: 24px; font-weight: 800; }
+
+  label { display: block; font-weight: 700; margin: 12px 0 6px; font-size: 16px; }
+  input, select {
+    width: 100%; padding: 14px; font-size: 18px;
+    border: 2px solid var(--line); border-radius: 12px; background: var(--white);
+    color: var(--black);
+  }
+  input:focus, select:focus { outline: none; border-color: var(--blue); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 54px; padding: 12px 20px; border: none; border-radius: 14px;
+    font-size: 17px; font-weight: 700; cursor: pointer; width: 100%;
+    transition: transform .08s ease, opacity .2s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--blue); color: var(--white); }
+  .btn-green { background: var(--green); color: var(--white); }
+  .btn-whatsapp { background: #25D366; color: var(--white); }
+  .btn-outline { background: var(--white); color: var(--blue); border: 2px solid var(--blue); }
+  .btn-black { background: var(--black); color: var(--white); }
+  .btn-danger { background: var(--red-soft); color: var(--red); }
+  .btn-small { min-height: 44px; font-size: 15px; padding: 8px 14px; width: auto; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  .tenant-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+
+  .tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; }
+  .tab {
+    flex: 0 0 auto; padding: 10px 16px; border-radius: 999px;
+    background: var(--white); border: 2px solid var(--line);
+    font-weight: 700; font-size: 15px; color: var(--grey); cursor: pointer;
+  }
+  .tab.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
+
+  .bill-box {
+    background: var(--blue-soft); border-radius: 14px; padding: 14px; margin-top: 12px;
+  }
+  .bill-box .line { display: flex; justify-content: space-between; padding: 4px 0; font-size: 16px; }
+  .bill-box .total { font-size: 20px; font-weight: 800; color: var(--blue-dark); border-top: 2px dashed var(--blue); margin-top: 6px; padding-top: 8px; }
+
+  .empty { text-align: center; padding: 30px 10px; color: var(--grey); }
+  .empty .icon { font-size: 44px; margin-bottom: 8px; }
+
+  nav.bottom {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--black); display: flex; justify-content: space-around;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+  }
+  nav.bottom button {
+    background: none; border: none; color: #9AA5B4; font-size: 13px; font-weight: 700;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1;
+    padding: 8px 2px; border-radius: 12px; cursor: pointer; min-height: 56px;
+  }
+  nav.bottom button .ico { font-size: 22px; }
+  nav.bottom button.active { color: var(--white); background: var(--blue); }
+
+  .toast {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    background: var(--black); color: var(--white); padding: 12px 20px;
+    border-radius: 12px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: opacity .25s; z-index: 30; max-width: 90%; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none;
+    align-items: flex-end; justify-content: center; z-index: 40;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--white); width: 100%; max-width: 720px;
+    border-radius: 22px 22px 0 0; padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal h2 { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sharma PG</h1>
+  <p id="ownerLine">Owner</p>
+</header>
+
+<main>
+
+  <!-- TENANTS -->
+  <section class="view active" id="view-tenants">
+    <div class="summary">
+      <div class="card"><div class="muted">Tenants</div><div class="big" id="sumTenants">0</div></div>
+      <div class="card"><div class="muted">Rooms in use</div><div class="big" id="sumRooms">0</div></div>
+    </div>
+    <button class="btn btn-primary" id="btnAddTenant" style="margin-bottom:14px">+ Add Tenant</button>
+    <div id="tenantList" class="stack"></div>
+  </section>
+
+  <!-- RENT -->
+  <section class="view" id="view-rent">
+    <div class="card">
+      <label for="rentMonth" style="margin-top:0">Month</label>
+      <input type="month" id="rentMonth">
+    </div>
+    <div class="summary">
+      <div class="card"><div class="muted">Paid</div><div class="big" id="sumPaid" style="color:var(--green)">₹0</div></div>
+      <div class="card"><div class="muted">Unpaid</div><div class="big" id="sumUnpaid" style="color:var(--red)">₹0</div></div>
+    </div>
+    <h2 style="color:var(--red)">Unpaid Rent</h2>
+    <div id="unpaidList" class="stack"></div>
+    <h2 style="color:var(--green);margin-top:18px">Paid Rent</h2>
+    <div id="paidList" class="stack"></div>
+  </section>
+
+  <!-- ELECTRICITY -->
+  <section class="view" id="view-electricity">
+    <div class="card">
+      <label for="elecMonth" style="margin-top:0">Month</label>
+      <input type="month" id="elecMonth">
+      <label for="elecRate">Electricity rate per unit (₹)</label>
+      <input type="number" id="elecRate" inputmode="decimal" min="0" step="0.5">
+    </div>
+    <div class="card">
+      <label for="elecTenant" style="margin-top:0">Select tenant / room</label>
+      <select id="elecTenant"></select>
+      <div id="elecBox"></div>
+    </div>
+    <div id="elecOverview" class="stack"></div>
+  </section>
+
+  <!-- REMINDERS -->
+  <section class="view" id="view-reminders">
+    <div class="card">
+      <label for="remMonth" style="margin-top:0">Month</label>
+      <input type="month" id="remMonth">
+      <p class="muted" style="margin-top:10px">Tap <b>WhatsApp</b> beside a tenant. A message is prepared for you. Press <b>Send</b> in WhatsApp yourself.</p>
+    </div>
+    <div id="remList" class="stack"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="view-settings">
+    <div class="card">
+      <h3>Owner details</h3>
+      <label for="ownerName" style="margin-top:8px">Owner name</label>
+      <input type="text" id="ownerName" placeholder="Owner name">
+      <button class="btn btn-primary" id="btnSaveOwner" style="margin-top:12px">Save Owner Name</button>
+    </div>
+    <div class="card">
+      <h3>Electricity</h3>
+      <label for="settingsRate" style="margin-top:8px">Rate per unit (₹)</label>
+      <input type="number" id="settingsRate" inputmode="decimal" min="0" step="0.5">
+      <button class="btn btn-primary" id="btnSaveRate" style="margin-top:12px">Save Rate</button>
+    </div>
+    <div class="card">
+      <h3>Backup</h3>
+      <p class="muted" style="margin-bottom:12px">Your data is saved on this phone. Export a backup regularly, and import it if you change phones.</p>
+      <div class="stack">
+        <button class="btn btn-green" id="btnExport">Export Backup</button>
+        <button class="btn btn-outline" id="btnImport">Import Backup</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+    </div>
+    <div class="card">
+      <button class="btn btn-danger" id="btnReset">Erase All Data</button>
+    </div>
+  </section>
+
+</main>
+
+<nav class="bottom">
+  <button data-view="tenants" class="active"><span class="ico">🏠</span>Tenants</button>
+  <button data-view="rent"><span class="ico">₹</span>Rent</button>
+  <button data-view="electricity"><span class="ico">⚡</span>Power</button>
+  <button data-view="reminders"><span class="ico">💬</span>Remind</button>
+  <button data-view="settings"><span class="ico">⚙️</span>Settings</button>
+</nav>
+
+<!-- Tenant modal -->
+<div class="modal-bg" id="tenantModal">
+  <div class="modal">
+    <h2 id="tenantModalTitle">Add Tenant</h2>
+    <label for="tName">Tenant name</label>
+    <input type="text" id="tName" placeholder="Full name">
+    <label for="tRoom">Room number</label>
+    <input type="text" id="tRoom" placeholder="e.g. 101" inputmode="text">
+    <label for="tPhone">Phone number</label>
+    <input type="tel" id="tPhone" placeholder="e.g. 9876543210" inputmode="tel">
+    <label for="tRent">Monthly rent (₹)</label>
+    <input type="number" id="tRent" inputmode="numeric" min="0">
+    <div class="btn-row" style="margin-top:18px">
+      <button class="btn btn-outline" id="tCancel">Cancel</button>
+      <button class="btn btn-primary" id="tSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'sharmaPG.v1';
+  const RUPEE = '₹';
+  const fmt = (n) => RUPEE + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uid = () => 'T' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const thisMonth = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+
+  // ---------- Data ----------
+  const emptyData = () => ({ owner: 'Owner', rate: 8, tenants: [], readings: {}, payments: {} });
+  let data = load();
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return emptyData();
+      const d = JSON.parse(raw);
+      return Object.assign(emptyData(), d);
+    } catch (e) {
+      console.error('Load failed', e);
+      return emptyData();
+    }
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    catch (e) { toast('Could not save. Storage may be full.'); console.error(e); }
+  }
+
+  // ---------- Helpers ----------
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+  function getTenant(id) { return data.tenants.find(t => t.id === id); }
+  function reading(month, tid) { return (data.readings[month] || {})[tid]; }
+  function electricityOf(month, tid) { const r = reading(month, tid); return r ? r.amount : 0; }
+  function totalDue(month, t) { return Number(t.rent || 0) + electricityOf(month, t.id); }
+  function isPaid(month, tid) { return !!((data.payments[month] || {})[tid]); }
+  function previousReadingFor(month, tid) {
+    // last saved current reading in any month before this one
+    const months = Object.keys(data.readings).filter(m => m < month).sort();
+    for (let i = months.length - 1; i >= 0; i--) {
+      const r = (data.readings[months[i]] || {})[tid];
+      if (r) return r.curr;
+    }
+    return 0;
+  }
+  function phoneForWhatsApp(p) {
+    let digits = String(p || '').replace(/\D/g, '');
+    if (digits.length === 10) digits = '91' + digits;
+    return digits;
+  }
+  function monthLabel(m) {
+    if (!m) return '';
+    const [y, mo] = m.split('-');
+    return new Date(Number(y), Number(mo) - 1, 1).toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+  }
+
+  // Shared month value
+  let month = thisMonth();
+  ['rentMonth', 'elecMonth', 'remMonth'].forEach(id => { $(id).value = month; });
+
+  function setMonth(m) {
+    month = m || thisMonth();
+    ['rentMonth', 'elecMonth', 'remMonth'].forEach(id => { $(id).value = month; });
+    renderAll();
+  }
+
+  // ---------- Views ----------
+  let currentView = 'tenants';
+  function showView(name) {
+    currentView = name;
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    document.querySelectorAll('nav.bottom button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    renderAll();
+  }
+  document.querySelectorAll('nav.bottom button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+
+  // ---------- Tenants ----------
+  let editingId = null;
+  function openTenantModal(t) {
+    editingId = t ? t.id : null;
+    $('tenantModalTitle').textContent = t ? 'Edit Tenant' : 'Add Tenant';
+    $('tName').value = t ? t.name : '';
+    $('tRoom').value = t ? t.room : '';
+    $('tPhone').value = t ? t.phone : '';
+    $('tRent').value = t ? t.rent : '';
+    $('tenantModal').classList.add('show');
+    setTimeout(() => $('tName').focus(), 150);
+  }
+  function closeTenantModal() { $('tenantModal').classList.remove('show'); }
+
+  $('btnAddTenant').addEventListener('click', () => openTenantModal(null));
+  $('tCancel').addEventListener('click', closeTenantModal);
+  $('tenantModal').addEventListener('click', (e) => { if (e.target.id === 'tenantModal') closeTenantModal(); });
+
+  $('tSave').addEventListener('click', () => {
+    const name = $('tName').value.trim();
+    const room = $('tRoom').value.trim();
+    const phone = $('tPhone').value.trim();
+    const rent = Number($('tRent').value);
+    if (!name) return toast('Please enter the tenant name');
+    if (!room) return toast('Please enter the room number');
+    if (!phone || phone.replace(/\D/g, '').length < 10) return toast('Enter a valid 10-digit phone number');
+    if (!(rent >= 0) || $('tRent').value === '') return toast('Please enter the monthly rent');
+
+    if (editingId) {
+      const t = getTenant(editingId);
+      Object.assign(t, { name, room, phone, rent });
+      toast('Tenant updated');
+    } else {
+      data.tenants.push({ id: uid(), name, room, phone, rent, joined: thisMonth() });
+      toast('Tenant added');
+    }
+    save();
+    closeTenantModal();
+    renderAll();
+  });
+
+  function deleteTenant(id) {
+    const t = getTenant(id);
+    if (!t) return;
+    if (!confirm('Remove ' + t.name + ' (Room ' + t.room + ')? Their records will be removed too.')) return;
+    data.tenants = data.tenants.filter(x => x.id !== id);
+    Object.keys(data.readings).forEach(m => delete data.readings[m][id]);
+    Object.keys(data.payments).forEach(m => delete data.payments[m][id]);
+    save();
+    toast('Tenant removed');
+    renderAll();
+  }
+
+  function renderTenants() {
+    const list = $('tenantList');
+    const rooms = new Set(data.tenants.map(t => t.room));
+    $('sumTenants').textContent = data.tenants.length;
+    $('sumRooms').textContent = rooms.size;
+    if (!data.tenants.length) {
+      list.innerHTML = '<div class="card empty"><div class="icon">🛏️</div><p>No tenants yet.<br>Tap <b>+ Add Tenant</b> to start.</p></div>';
+      return;
+    }
+    const sorted = [...data.tenants].sort((a, b) => String(a.room).localeCompare(String(b.room), undefined, { numeric: true }));
+    list.innerHTML = sorted.map(t => `
+      <div class="card">
+        <div class="row">
+          <div>
+            <h3>${esc(t.name)}</h3>
+            <div class="muted">Room ${esc(t.room)} · ${esc(t.phone)}</div>
+          </div>
+          <div class="amount">${fmt(t.rent)}<div class="muted" style="font-size:13px;text-align:right;font-weight:600">per month</div></div>
+        </div>
+        <div class="tenant-actions">
+          <button class="btn btn-whatsapp" data-wa="${t.id}">WhatsApp</button>
+          <button class="btn btn-outline" data-edit="${t.id}">Edit</button>
+          <button class="btn btn-danger" style="grid-column:1 / -1" data-del="${t.id}">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  $('tenantList').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.wa) return sendWhatsApp(b.dataset.wa);
+    if (b.dataset.edit) return openTenantModal(getTenant(b.dataset.edit));
+    if (b.dataset.del) return deleteTenant(b.dataset.del);
+  });
+
+  // ---------- Rent ----------
+  function renderRent() {
+    const paid = [], unpaid = [];
+    data.tenants.forEach(t => (isPaid(month, t.id) ? paid : unpaid).push(t));
+    let paidSum = 0, unpaidSum = 0;
+    paid.forEach(t => paidSum += totalDue(month, t));
+    unpaid.forEach(t => unpaidSum += totalDue(month, t));
+    $('sumPaid').textContent = fmt(paidSum);
+    $('sumUnpaid').textContent = fmt(unpaidSum);
+
+    const row = (t, isP) => `
+      <div class="card">
+        <div class="row">
+          <div>
+            <h3>${esc(t.name)}</h3>
+            <div class="muted">Room ${esc(t.room)}</div>
+          </div>
+          <span class="badge ${isP ? 'paid' : 'unpaid'}">${isP ? 'Paid' : 'Unpaid'}</span>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="muted">Rent ${fmt(t.rent)}${electricityOf(month, t.id) ? ' + Power ' + fmt(electricityOf(month, t.id)) : ''}</div>
+          <div class="amount">${fmt(totalDue(month, t))}</div>
+        </div>
+        <button class="btn ${isP ? 'btn-outline' : 'btn-green'}" style="margin-top:12px" data-pay="${t.id}" data-state="${isP ? 'unpaid' : 'paid'}">
+          ${isP ? 'Mark as Unpaid' : '✓ Mark as Paid'}
+        </button>
+      </div>`;
+
+    $('unpaidList').innerHTML = unpaid.length
+      ? unpaid.map(t => row(t, false)).join('')
+      : '<div class="card empty"><div class="icon">🎉</div><p>All rent is paid for ' + monthLabel(month) + '.</p></div>';
+    $('paidList').innerHTML = paid.length
+      ? paid.map(t => row(t, true)).join('')
+      : '<div class="card empty"><div class="icon">📭</div><p>No payments recorded yet this month.</p></div>';
+  }
+  function togglePayment(e) {
+    const b = e.target.closest('button[data-pay]'); if (!b) return;
+    const id = b.dataset.pay;
+    data.payments[month] = data.payments[month] || {};
+    if (b.dataset.state === 'paid') {
+      data.payments[month][id] = new Date().toISOString().slice(0, 10);
+      toast('Marked as paid ✓');
+    } else {
+      delete data.payments[month][id];
+      toast('Marked as unpaid');
+    }
+    save();
+    renderAll();
+  }
+  $('unpaidList').addEventListener('click', togglePayment);
+  $('paidList').addEventListener('click', togglePayment);
+
+  // ---------- Electricity ----------
+  let elecTenantId = null;
+  function renderElecSelect() {
+    const sel = $('elecTenant');
+    const sorted = [...data.tenants].sort((a, b) => String(a.room).localeCompare(String(b.room), undefined, { numeric: true }));
+    sel.innerHTML = sorted.length
+      ? sorted.map(t => `<option value="${t.id}">Room ${esc(t.room)} · ${esc(t.name)}</option>`).join('')
+      : '<option value="">Add a tenant first</option>';
+    if (!elecTenantId || !getTenant(elecTenantId)) elecTenantId = sorted[0] ? sorted[0].id : null;
+    sel.value = elecTenantId || '';
+  }
+
+  function renderElecBox() {
+    const box = $('elecBox');
+    const t = getTenant(elecTenantId);
+    if (!t) { box.innerHTML = ''; return; }
+    const saved = reading(month, t.id);
+    const prev = saved ? saved.prev : previousReadingFor(month, t.id);
+    const curr = saved ? saved.curr : '';
+    box.innerHTML = `
+      <label for="elecPrev">Previous meter reading</label>
+      <input type="number" id="elecPrev" inputmode="decimal" min="0" value="${prev}">
+      <label for="elecCurr">Current meter reading</label>
+      <input type="number" id="elecCurr" inputmode="decimal" min="0" value="${curr}" placeholder="Type the new reading">
+      <div class="bill-box" id="billPreview"></div>
+      <button class="btn btn-primary" id="btnSaveReading" style="margin-top:14px">Save Electricity Bill</button>
+    `;
+    const update = () => updateBillPreview();
+    $('elecPrev').addEventListener('input', update);
+    $('elecCurr').addEventListener('input', update);
+    $('btnSaveReading').addEventListener('click', saveReading);
+    updateBillPreview();
+  }
+
+  function calcBill() {
+    const prev = Number($('elecPrev').value);
+    const curr = Number($('elecCurr').value);
+    const rate = Number($('settingsRate').value || data.rate || 0);
+    const units = $('elecCurr').value === '' ? 0 : curr - prev;
+    return { prev, curr, units, rate, amount: Math.max(0, units) * rate };
+  }
+
+  function updateBillPreview() {
+    const p = $('billPreview'); if (!p) return;
+    if ($('elecCurr').value === '') {
+      p.innerHTML = '<div class="muted">Type the current reading to see the bill.</div>';
+      return;
+    }
+    const b = calcBill();
+    const bad = b.units < 0;
+    p.innerHTML = `
+      <div class="line"><span>Units used</span><b>${bad ? '—' : b.units}</b></div>
+      <div class="line"><span>Rate per unit</span><b>${fmt(b.rate)}</b></div>
+      <div class="total row"><span>Electricity bill</span><span>${bad ? 'Check readings' : fmt(b.amount)}</span></div>
+      ${bad ? '<div style="color:var(--red);font-weight:700;margin-top:6px">Current reading cannot be less than previous.</div>' : ''}
+    `;
+  }
+
+  function saveReading() {
+    const t = getTenant(elecTenantId); if (!t) return;
+    if ($('elecCurr').value === '') return toast('Enter the current meter reading');
+    const b = calcBill();
+    if (b.units < 0) return toast('Current reading cannot be less than previous');
+    data.readings[month] = data.readings[month] || {};
+    data.readings[month][t.id] = { prev: b.prev, curr: b.curr, units: b.units, rate: b.rate, amount: Math.round(b.amount * 100) / 100 };
+    data.rate = b.rate;
+    save();
+    toast('Bill saved for ' + t.name);
+    renderAll();
+  }
+
+  function renderElecOverview() {
+    const wrap = $('elecOverview');
+    const rows = data.tenants.map(t => {
+      const r = reading(month, t.id);
+      return r
+        ? `<div class="card"><div class="row"><div><h3>Room ${esc(t.room)} · ${esc(t.name)}</h3><div class="muted">${r.prev} → ${r.curr} · ${r.units} units × ${fmt(r.rate)}</div></div><div class="amount">${fmt(r.amount)}</div></div></div>`
+        : `<div class="card"><div class="row"><div><h3>Room ${esc(t.room)} · ${esc(t.name)}</h3><div class="muted">No reading yet</div></div><span class="badge unpaid">Pending</span></div></div>`;
+    }).join('');
+    wrap.innerHTML = rows || '<div class="card empty"><div class="icon">⚡</div><p>Add tenants to record electricity.</p></div>';
+  }
+
+  $('elecTenant').addEventListener('change', (e) => { elecTenantId = e.target.value; renderElecBox(); });
+  $('elecRate').addEventListener('change', () => {
+    data.rate = Number($('elecRate').value) || 0; save(); $('settingsRate').value = data.rate; renderAll();
+  });
+
+  function renderElectricity() {
+    renderElecSelect();
+    renderElecBox();
+    renderElecOverview();
+    $('elecRate').value = data.rate;
+  }
+
+  // ---------- Reminders ----------
+  function buildMessage(t) {
+    const amount = totalDue(month, t);
+    const r = reading(month, t.id);
+    let msg = `Hello ${t.name},\n\nThis is a rent reminder from Sharma PG.\nRoom: ${t.room}\nMonth: ${monthLabel(month)}\nRent: ${fmt(t.rent)}`;
+    if (r) msg += `\nElectricity: ${fmt(r.amount)}`;
+    msg += `\nTotal amount due: ${fmt(amount)}\n\nPlease pay at the earliest. Thank you.\n${data.owner}`;
+    return msg;
+  }
+  function sendWhatsApp(id) {
+    const t = getTenant(id); if (!t) return;
+    const phone = phoneForWhatsApp(t.phone);
+    const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(buildMessage(t));
+    window.open(url, '_blank');
+  }
+  function renderReminders() {
+    const wrap = $('remList');
+    if (!data.tenants.length) {
+      wrap.innerHTML = '<div class="card empty"><div class="icon">💬</div><p>Add tenants to send reminders.</p></div>';
+      return;
+    }
+    const unpaid = data.tenants.filter(t => !isPaid(month, t.id));
+    const list = unpaid.length ? unpaid : data.tenants;
+    const heading = unpaid.length ? '' : '<div class="card empty"><div class="icon">✅</div><p>Everyone has paid for ' + monthLabel(month) + '.</p></div>';
+    wrap.innerHTML = heading + list.map(t => `
+      <div class="card">
+        <div class="row">
+          <div>
+            <h3>${esc(t.name)}</h3>
+            <div class="muted">Room ${esc(t.room)}</div>
+          </div>
+          <div class="amount">${fmt(totalDue(month, t))}</div>
+        </div>
+        <button class="btn btn-whatsapp" style="margin-top:12px" data-wa="${t.id}">💬 WhatsApp Reminder</button>
+      </div>`).join('');
+  }
+  $('remList').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-wa]'); if (b) sendWhatsApp(b.dataset.wa);
+  });
+
+  // ---------- Settings ----------
+  function renderSettings() {
+    $('ownerName').value = data.owner;
+    $('settingsRate').value = data.rate;
+  }
+  $('btnSaveOwner').addEventListener('click', () => {
+    const v = $('ownerName').value.trim();
+    if (!v) return toast('Enter the owner name');
+    data.owner = v; save(); toast('Owner name saved'); renderAll();
+  });
+  $('btnSaveRate').addEventListener('click', () => {
+    const v = Number($('settingsRate').value);
+    if (!(v >= 0)) return toast('Enter a valid rate');
+    data.rate = v; save(); toast('Rate saved'); renderAll();
+  });
+
+  // ---------- Backup ----------
+  $('btnExport').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sharma-pg-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('Backup downloaded');
+  });
+  $('btnImport').addEventListener('click', () => $('importFile').click());
+  $('importFile').addEventListener('change', (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const d = JSON.parse(reader.result);
+        if (!d || !Array.isArray(d.tenants)) throw new Error('Invalid backup');
+        if (!confirm('Replace current data with this backup?')) return;
+        data = Object.assign(emptyData(), d);
+        save(); toast('Backup restored'); renderAll();
+      } catch (err) {
+        toast('This file is not a valid Sharma PG backup');
+      }
+      $('importFile').value = '';
+    };
+    reader.readAsText(file);
+  });
+  $('btnReset').addEventListener('click', () => {
+    if (!confirm('Erase ALL data on this phone? Export a backup first.')) return;
+    data = emptyData(); save(); toast('All data erased'); renderAll();
+  });
+
+  // ---------- Month pickers ----------
+  ['rentMonth', 'elecMonth', 'remMonth'].forEach(id => {
+    $(id).addEventListener('change', (e) => setMonth(e.target.value));
+  });
+
+  // ---------- Render ----------
+  function renderAll() {
+    $('ownerLine').textContent = data.owner + ' · ' + monthLabel(month);
+    renderTenants();
+    renderRent();
+    renderElectricity();
+    renderReminders();
+    renderSettings();
+  }
+
+  // ---------- Service worker ----------
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW failed', err));
+    });
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
